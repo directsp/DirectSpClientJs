@@ -4,7 +4,9 @@ DirectSp client for JavaScript
 ## Usage
 
 1. Install by NPM
+``` NPM
 npm i @directsp/client-js
+```
 
 2. Create and intialize object
 ```javascript
