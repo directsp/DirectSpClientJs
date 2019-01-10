@@ -14,7 +14,9 @@ import { directSp } from "../node_modules/@directsp/client-js";
 
 // Creating a global DirectSpClient object
 window.dspClient = new directSp.DirectSpClient({
-  resourceApiUri: "http://127.0.0.1:9696/api",
+  resourceApiUri: "http:/your_directsp_host_url/api",
+  isLogEnabled: true,
+  isUseAppErrorHandler: true,
   auth: {
     baseEndpointUri: "https://your_auth_server_url/",
     isAutoSignIn: true,
