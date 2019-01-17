@@ -22,16 +22,15 @@ window.dspClient = new directSp.DirectSpClient({
     isAutoSignIn: true,
     clientId: "1234567",
     scope: "offline_access profile",
-    type: "code",
-    redirectUri: "https://your_spa_url/redirect"
+    type: "code"
   }
 });
 
 // Initializing the object
-window.dspClient.init();
+dspClient.init();
 
 // Handle authentication if any
-window.dspClient.onIntialized(data)
+dspClient.onAuthorized(data)
 {
   console.log(data);
   console.log(data.lastPageUri);
