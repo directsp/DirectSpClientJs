@@ -1,5 +1,5 @@
 namespace directSp {
-
+    
     export interface IDirectSpOptions {
         homePageUri?: string;
         resourceApiUri?: string;
