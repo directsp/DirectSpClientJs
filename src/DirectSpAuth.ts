@@ -535,6 +535,7 @@ namespace directSp {
                     data: requestParam,
                 });
                 const token: IToken = JSON.parse(result.data);
+                this.setTokens(token);
                 this._fireAuthorizedEvent();
                 return token;
             }

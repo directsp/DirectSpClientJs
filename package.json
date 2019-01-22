@@ -1,6 +1,6 @@
 {
   "name": "@directsp/client-js",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "DirectSp Client js",
   "main": "./lib/directsp.js",
   "typings": "./lib/directsp.d.ts",
@@ -14,10 +14,10 @@
   "author": "Mohammad Nikravan",
   "license": "ISC",
   "devDependencies": {
-    "@types/jest": "^23.3.10",
+    "@types/jest": "^23.3.13",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.4"
   },
   "files": [
     "lib"
