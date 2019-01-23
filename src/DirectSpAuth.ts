@@ -437,7 +437,8 @@ namespace directSp {
             }
 
             //Refreshing token
-            console.log("DirectSp: Refreshing current token ...");
+            if (this.dspClient.isLogEnabled)
+                console.log("DirectSp: Refreshing current token ...");
             if (!this.tokenEndpointUri)
                 throw new DirectSpError("tokenEndpointUri has not been set for refreshing token!");
 

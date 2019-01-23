@@ -1,4 +1,4 @@
-import {directSp} from "../lib/directsp.js";
+import { directSp } from "../lib/directsp.js";
 import { DirectSpControlFake, TestUtil } from "./TestUtil";
 
 // ---------------
@@ -7,6 +7,7 @@ import { DirectSpControlFake, TestUtil } from "./TestUtil";
 test('autoSignin on', async () => {
   //init
   const client = TestUtil.CreateDspClient(null, {
+    isLogEnabled: false,
     auth: {
       baseEndpointUri: "https://fake_auth_server.local/", isAutoSignIn: true,
       clientId: "1234567",
@@ -39,7 +40,10 @@ test('autoSignin on', async () => {
 // ---------------
 test('autoSignin off', async () => {
   //simulate result
-  const client = TestUtil.CreateDspClient(null, { auth: { baseEndpointUri: "https://fakeauth.local/", isAutoSignIn: false } });
+  const client = TestUtil.CreateDspClient(null, {
+    isLogEnabled: false,
+    auth: { baseEndpointUri: "https://fakeauth.local/", isAutoSignIn: false }
+  });
   await client.init();
 
   // wait for calling onAuthorize
@@ -53,20 +57,21 @@ test('autoSignin off', async () => {
 test('login by redirect and refresh token', async () => {
   //init options
   const options: directSp.IDirectSpOptions = {
+    sessionState: "fake_state",
+    isLogEnabled: false,
     auth: {
       baseEndpointUri: "https://fake_auth_server.local/",
       isAutoSignIn: true,
       clientId: "1234567",
       scope: "offline_access profile",
-      type: "token",
+      type: "code",
       redirectUri: "https://fakeclient.local/temp/callback",
-    },
-    sessionState: "fake_state",
-    isLogEnabled: true
+    }
   }
 
   // null protection
-  if (!options.auth) throw new directSp.DirectSpError("options.auth is not initialized!");
+  if (!options.auth)
+    throw new directSp.DirectSpError("options.auth is not initialized!");
 
   const refresh_token1 = "fake_refresh_token1";
   const refresh_token2 = "fake_refresh_token2";
@@ -138,4 +143,43 @@ test('login by redirect and refresh token', async () => {
   if (!client.auth.userInfo) throw new directSp.DirectSpError("client.auth.userInfo has not been retrieved!");
   expect(client.auth.userInfo.name).toBe("David");
 
+});
+
+// ---------------
+// Test
+// ---------------
+test('SignInByGrandPassword', async () => {
+  //init options
+  const options: directSp.IDirectSpOptions = {
+    sessionState: "fake_state",
+    isLogEnabled: true,
+    auth: {
+      baseEndpointUri: "https://fake_auth_server.local/",
+      clientId: "1234567",
+      scope: "offline_access profile",
+      type: "token"
+    }
+  }
+
+  const client = TestUtil.CreateDspClient((request) => {
+    if (request.data && request.data.grant_type == "password") {
+      const tokens: directSp.IToken = {
+        access_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3NUE5MjkyRjE5RjE0RkMyQjlCODBBQjA2MkEwNkJFODYyMzYxOUMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIxMDAwMTIxNSIsInVzZXJuYW1lIjoiTG95YWx0eV9BZG1pbiIsInRva2VuX3VzYWdlIjoiYWNjZXNzX3Rva2VuIiwianRpIjoiNDZjNzhkMzUtNDQ0OC00NTM4LTlmNGEtZjY4ZGYzZDhjNmM5IiwiY2ZkX2x2bCI6InByaXZhdGUiLCJzY29wZSI6WyJwcm9maWxlIiwib2ZmbGluZV9hY2Nlc3MiLCIyOSJdLCJhdWQiOiJhZG1pbmxveWFsdHlfYTUwMjI1ZjAxN2ZiNDYxMzliOTc4MGU5ODdmMGJhZWEiLCJhenAiOiJhZG1pbmxveWFsdHlfYTUwMjI1ZjAxN2ZiNDYxMzliOTc4MGU5ODdmMGJhZWEiLCJuYmYiOjE1NDQxMzIxMTksImV4cCI6MTU0NDEzMzkxOSwiaWF0IjoxNTQ0MTMyMTE5LCJpc3MiOiJodHRwczovL2F1dGguaXJhbmlhbi5jYXJkcy8iLCJhY3RvcnQiOiJleUpoYkdjaU9pSnViMjVsSWl3aWRIbHdJam9pU2xkVUluMC5leUp6ZFdJaU9pSmhaRzFwYm14dmVXRnNkSGxmWVRVd01qSTFaakF4TjJaaU5EWXhNemxpT1RjNE1HVTVPRGRtTUdKaFpXRWlmUS4ifQ.fakesign",
+        expires_in: 1800,
+        refresh_token: "refresh_token",
+        token_type: "Bearer"
+      };
+      return { data: tokens };
+    }
+
+    return { data: null };
+  }, options);
+  
+  if (!client.auth) throw new directSp.DirectSpError("client.auth is not initialized!");
+
+  await client.init();
+
+  expect(client.auth.isAuthorized).toBe(false);
+  await client.auth.signInByPasswordGrant("username", "password");
+  expect(client.auth.isAuthorized).toBe(true);
 });
