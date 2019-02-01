@@ -1,6 +1,6 @@
 namespace directSp {
     export class DirectSpHelp {
-        public static help(systemApi: any, criteria: string | null = null): string {
+        public static help(systemApi: any, criteria: string | null = null, exactMatch: boolean = false): string {
             let result = "";
 
             // show help
@@ -12,7 +12,7 @@ namespace directSp {
             for (var item in systemApi) {
                 if (systemApi.hasOwnProperty(item)) {
                     let api = systemApi[item];
-                    if (criteria == null || api.procedureName.toLowerCase().indexOf(criteria) != -1) {
+                    if (criteria == null || api.procedureName.toLowerCase() == criteria || (!exactMatch && api.procedureName.toLowerCase().indexOf(criteria) != -1)) {
                         foundProc.push(api);
                     }
                 }

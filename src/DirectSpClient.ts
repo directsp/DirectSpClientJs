@@ -1,5 +1,5 @@
 namespace directSp {
-    
+
     export interface IDirectSpOptions {
         homePageUri?: string;
         resourceApiUri?: string;
@@ -393,6 +393,7 @@ namespace directSp {
 
             // reloading
             if (isReloadNeeded) {
+                this._systemApi = null;
 
                 //call new version event
                 if (this.onNewVersion)
@@ -435,24 +436,31 @@ namespace directSp {
             }
         };
 
-        public help(criteria: string | null = null, reload: boolean = false): string {
+        public help(criteria: string | null = null, exactMacth: boolean = false, reload: boolean = false): string {
+            if (criteria && criteria[criteria.length - 1] == '.' && !exactMacth) {
+                exactMacth = true;
+                criteria = criteria.slice(0, criteria.length - 1);
+            }
 
+            return this._help(criteria, exactMacth, reload);
+        };
+
+        private _help(criteria: string | null, exactMacth: boolean, reload: boolean) {
             //Load Api info if it is not loaded
             if (!this._systemApi || reload) {
                 this.invoke("System_api").then(data => {
                     this._systemApi = data.api;
                     if (this._systemApi)
-                        this.help(criteria);
+                        this._help(criteria, exactMacth, false);
                     else
                         console.log("DirectSp: Could not retreive API information!");
                 });
                 return "";
             }
 
-            let res = DirectSpHelp.help(this._systemApi, criteria);
+            let res = DirectSpHelp.help(this._systemApi, criteria, exactMacth);
             console.log(res);
             return "";
-        };
-
+        }
     };
 }
