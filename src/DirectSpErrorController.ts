@@ -16,6 +16,7 @@ namespace directSp {
         private readonly _promise: Promise<IDirectSpResponse>;
         private _reject: ((error: DirectSpError) => void) | null = null;
         private _resolve: ((data: IDirectSpResponse) => void) | null = null;
+        private _isReleased: boolean = false;
 
         constructor(data: IDirectSpErrorControllerOptions) {
             this._data = data;
@@ -38,16 +39,19 @@ namespace directSp {
             this._promise = new Promise<IDirectSpResponse>((resolve, reject) => {
                 this._resolve = resolve;
                 this._reject = reject;
-                if (!this._canRetry)
+                if (!this._canRetry) {
+                    this._isReleased = true;
                     reject(data.error);
+                }
             });
         };
 
         public get promise(): Promise<IDirectSpResponse> { return this._promise; }
         public get error(): DirectSpError { return this._error; }
         public get captchaImageUri(): string | null { return this._captchaImageUri; }
-        public get canRetry(): boolean { return this._canRetry; }
+        public get canRetry(): boolean { return this._canRetry && !this._isReleased; }
         public get dspClient(): DirectSpClient { return this._data.dspClient; }
+        public get isReleased(): boolean { return this._isReleased; }
 
         public retry(): void {
             const request: IDirectSpRequest | undefined = this._data.request;
@@ -55,6 +59,7 @@ namespace directSp {
             if (!this.canRetry || !request)
                 throw new DirectSpError("Can not retry this error!");
 
+            if (this._isReleased) return;
 
             if (request && this._errorNumber == 55022) {
                 const requestData: any = request.data;
@@ -77,21 +82,27 @@ namespace directSp {
             // retry original ajax
             this.dspClient
                 ._fetch(request)
-                .then(resolve => {
-                    if (!this._resolve)
-                        throw new DirectSpError("Object is not ready yet!");
-                    return this._resolve(resolve);
+                .then(data => {
+                    if (!this._resolve) throw new DirectSpError("Object is not ready yet!");
+                    if (this._isReleased) return data;
+
+                    this._isReleased = true;
+                    return this._resolve(data);
                 })
                 .catch(error => {
-                    if (!this._reject)
-                        throw new DirectSpError("Object is not ready yet!");
+                    if (!this._reject) throw new DirectSpError("Object is not ready yet!");
+                    if (this._isReleased) throw error;
+
+                    this._isReleased = true;
                     return this._reject(error);
                 });
         };
 
         public release(): void {
-            if (!this._reject)
-                throw new DirectSpError("Object is not ready yet!");
+            if (!this._reject) throw new DirectSpError("Object is not ready yet!");
+            if (this._isReleased) return;
+
+            this._isReleased = true;
             this._reject(this._error);
         };
     }
