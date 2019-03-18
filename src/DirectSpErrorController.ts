@@ -49,7 +49,7 @@ namespace directSp {
         public get promise(): Promise<IDirectSpResponse> { return this._promise; }
         public get error(): DirectSpError { return this._error; }
         public get captchaImageUri(): string | null { return this._captchaImageUri; }
-        public get canRetry(): boolean { return this._canRetry && !this._isReleased; }
+        public get canRetry(): boolean { return this._canRetry && !this._isReleased && this._data.request != null; }
         public get dspClient(): DirectSpClient { return this._data.dspClient; }
         public get isReleased(): boolean { return this._isReleased; }
 
