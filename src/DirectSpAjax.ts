@@ -19,6 +19,28 @@ namespace directSp {
 
     export class DirectSpXmlHttpAjaxProvider implements IDirectSpAjaxProvider {
 
+        private static _convertResponseHeadersToMap(headers: string): IDirectSpKeyToAny {
+            if (!headers)
+                return [];
+
+            // Convert the header string into an array
+            // of individual headers
+            let arr = headers.trim().split(/[\r\n]+/);
+
+            // Create a map of header names to values
+            let headerMap: IDirectSpKeyToAny = {};
+            arr.forEach(function (line: string) {
+                let parts: string[] = line.split(': ');
+                let header: string | undefined = parts.shift();
+                if (header) {
+                    let value: string | undefined = parts.join(': ');
+                    headerMap[header] = value;
+                }
+            });
+
+            return headerMap;
+        }
+
         fetch(request: IDirectSpRequest): Promise<IDirectSpResponse> {
             return new Promise((resolve, reject) => {
                 let req = new XMLHttpRequest();
@@ -27,7 +49,10 @@ namespace directSp {
                 req.onload = () => {
 
                     if (req.status == 200) {
-                        const response: IDirectSpResponse = { data: req.responseText, headers: req.getResponseHeader };
+                        const response: IDirectSpResponse = {
+                            data: req.responseText,
+                            headers: DirectSpXmlHttpAjaxProvider._convertResponseHeadersToMap(req.getAllResponseHeaders())
+                        };
                         resolve(response);
                     } else {
                         let error = null;

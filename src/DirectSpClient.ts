@@ -323,7 +323,7 @@ namespace directSp {
             });
 
             if (result.headers)
-                this._checkNewVersion(result.headers["DSP-AppVersion"]);
+                this._checkNewVersion(result.headers["dsp-appversion"]);
             return JSON.parse(result.data);
         };
 

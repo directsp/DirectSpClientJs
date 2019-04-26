@@ -1,6 +1,6 @@
 namespace directSp {
     export interface IDirectSpKeyToAny {
-        [ket: string]: any
+        [key: string]: any
     }
 
     export class Convert {

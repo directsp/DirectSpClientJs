@@ -1,0 +1,8 @@
+For Test
+
+1) First build the project
+2) Run "npx jest"
+
+
+For Publish:
+npm Publish
