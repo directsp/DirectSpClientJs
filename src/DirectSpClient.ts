@@ -265,7 +265,8 @@ namespace directSp {
             try {
                 const result = await this._invokeCore2(invokeParams);
                 if (seqGroup && seqGroupValue && seqGroupValue != this._seqGroups[seqGroup])
-                    throw new DirectSpError("request has been suppressed by seqGroup!");
+                    throw new exceptions.SeqGroupSuppressedException();
+
                 //log response
                 if (this.isLogEnabled)
                     console.log("DirectSp: invoke (Response)", method, invokeParams, result);
@@ -273,7 +274,8 @@ namespace directSp {
             }
             catch (error) {
                 if (seqGroup && seqGroupValue && seqGroupValue != this._seqGroups[seqGroup])
-                    throw new DirectSpError("request has been suppressed by seqGroup!");
+                    throw new exceptions.SeqGroupSuppressedException();
+
                 if (this.isLogEnabled)
                     console.warn("DirectSp: invoke (Response)", method, invokeParams, error);
                 throw error;
@@ -291,7 +293,7 @@ namespace directSp {
 
             let result = await this._processInvokeHook(hookParams);
             if (!result)
-                result = this._invokeCore3(hookParams.invokeParams);
+                result = await this._invokeCore3(hookParams.invokeParams);
 
             //return the promise if there is no api delay
             if (hookParams.delay == null || hookParams.delay <= 0)

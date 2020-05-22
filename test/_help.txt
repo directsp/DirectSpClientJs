@@ -5,4 +5,4 @@ For Test
 
 
 For Publish:
-npm Publish
+npm publish

@@ -17,12 +17,12 @@ namespace directSp {
             this.errorMessage = message;
         }
 
-        static create(data: any): DirectSpError {
+        public static create(data: any): DirectSpError {
             // already converted
-            if (data instanceof DirectSpError) return data;
+            if (data.errorMessage) return data;
 
             // create error
-            let error = new DirectSpError("");
+            let error = new DirectSpError(data && data.message ? data.message : "");
 
             //casting data
             if (data == null) {
@@ -105,5 +105,13 @@ namespace directSp {
                 this.errorName = "NotImplementedException";
             }
         }
+
+        export class SeqGroupSuppressedException extends DirectSpError {
+            constructor(message?: string) {
+                super("request has been suppressed by seqGroup!" + message ? " " + message : "");
+                this.errorType = "Client";
+                this.errorName = "SeqGroupSuppressedException";
+            }
+
     }
 }
