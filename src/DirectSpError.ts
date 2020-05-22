@@ -92,7 +92,7 @@ namespace directSp {
     export namespace exceptions {
         export class NotSupportedException extends DirectSpError {
             constructor(message?: string) {
-                super("The operation is not supported!" + message ? " " + message : "");
+                super("The operation is not supported!" + (message ? " " + message : ""));
                 this.errorType = "Client";
                 this.errorName = "NotSupportedException";
             }
@@ -100,7 +100,7 @@ namespace directSp {
 
         export class NotImplementedException extends DirectSpError {
             constructor(message?: string) {
-                super("The method is not implemeneted!" + message ? " " + message : "");
+                super("The method is not implemeneted!" + (message ? " " + message : ""));
                 this.errorType = "Client";
                 this.errorName = "NotImplementedException";
             }
@@ -108,7 +108,7 @@ namespace directSp {
 
         export class SeqGroupSuppressedException extends DirectSpError {
             constructor(message?: string) {
-                super("request has been suppressed by seqGroup!" + message ? " " + message : "");
+                super("request has been suppressed by seqGroup!" + (message ? " " + message : ""));
                 this.errorType = "Client";
                 this.errorName = "SeqGroupSuppressedException";
             }

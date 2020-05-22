@@ -97,3 +97,4 @@ test('seqGroup option and onBeforeInvoke', async () => {
   expect(results[4]).toBe(true);
 
 });
+
