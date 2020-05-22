@@ -177,7 +177,7 @@ namespace directSp {
          */
         public throwAppError(error: any, isUseAppErrorHandler?: boolean): void {
             error = DirectSpError.create(error);
-            isUseAppErrorHandler = Convert.toBoolean(isUseAppErrorHandler, this.isUseAppErrorHandler);
+            isUseAppErrorHandler = Convert.toBoolean(isUseAppErrorHandler, this.isUseAppErrorHandler) && error.errorName != "SeqGroupSuppressedException";
 
             if (!this.onError || !isUseAppErrorHandler)
                 throw error;

@@ -112,6 +112,6 @@ namespace directSp {
                 this.errorType = "Client";
                 this.errorName = "SeqGroupSuppressedException";
             }
-
+        }
     }
 }
