@@ -313,7 +313,7 @@ namespace directSp {
                 data: invokeParams,
                 method: "POST",
                 headers: {
-                    authorization: this.authHeader,
+                    Authorization: this.authHeader,
                     "Content-Type": "application/json;charset=utf-8"
                 },
                 cache: invokeParams.invokeOptions ? invokeParams.invokeOptions.cache : false
