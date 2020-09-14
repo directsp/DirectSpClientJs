@@ -16,31 +16,20 @@ import { directSp } from "../node_modules/@directsp/client-js";
 window.dspClient = new directSp.DirectSpClient({
   resourceApiUri: "http:/your_directsp_host_url/api",
   isLogEnabled: true,
-  isUseAppErrorHandler: true,
-  auth: {
-    baseEndpointUri: "https://your_auth_server_url/",
-    isAutoSignIn: true,
-    clientId: "1234567",
-    scope: "offline_access profile",
-    type: "code"
-  }
+  isUseAppErrorHandler: true
 });
 
 // Initializing the object
 dspClient.init();
 
 // Handle authentication if any
-dspClient.onAuthorized(data)
-{
-  console.log(data);
-  console.log(data.lastPageUri);
-}
-```
+// update this property as soon as your authorization provider gives you a new token
+dspClient.authHeader = "a bearer authorization token such as google user token";
 
 3. Invoke procedures
 
 ```javascript
-//without options
+// without options
 dspClient.invoke("MyMethod", { param1: "value1", param2: "value2" })
   .then(data => {
     console.log(data);
@@ -50,7 +39,7 @@ dspClient.invoke("MyMethod", { param1: "value1", param2: "value2" })
     console.log(data.recordset);
   });
 
-//with options
+// with options
 dspClient.invoke("MyMethod", { param1: "value1", param2: "value2" }, { recordIndex: 0, recordCount: 10 })
   .then(data => {
     console.log(data);
