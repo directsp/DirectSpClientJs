@@ -8,7 +8,6 @@ namespace directSp {
         isUseAppErrorHandler?: boolean;
         dspLocalStorage?: IDirectSpStorage;
         dspSessionStorage?: IDirectSpStorage;
-        auth?: IDirectSpAuthOptions;
         ajaxProvider?: IDirectSpAjaxProvider;
         control?: IDirectSpControl;
         sessionState?: string;
@@ -53,7 +52,6 @@ namespace directSp {
 
     /**
      * @see: https://github.com/directsp
-     * @event onAuthorized: check the authorization state
      * @event onError: fire when an herror occurred
      * @event: onNewVersion: fire when new API version detected
      * @event: onBeforeInvoke: fire beofore any invoke
@@ -62,11 +60,11 @@ namespace directSp {
         public isAutoReload: boolean;
         public isLogEnabled: boolean;
         public isUseAppErrorHandler: boolean;
+        public authHeader: string | null = null;
         private readonly _homePageUri: string | null;
         private readonly _storageNamePrefix: string = "DirectSp:";
         private readonly _resourceApiUri: string;
         private readonly _ajaxProvider: IDirectSpAjaxProvider;
-        private readonly _auth: DirectSpAuth | null;
         private readonly _originalUri: URL | null = null;
         private readonly _dspSessionStorage: IDirectSpStorage;
         private readonly _dspLocalStorage: IDirectSpStorage;
@@ -78,7 +76,6 @@ namespace directSp {
 
         //Events
         public onError: ((error: DirectSpErrorController) => void) | null = null;
-        public onAuthorized: ((data: IDirectSpAuthorizedData) => void) | null = null;
         public onNewVersion: (() => void) | null = null;
         public onBeforeInvoke: ((hookParams: IDirectSpHookParams) => Promise<IDirectSpRequest | void>) | null = null;
 
@@ -116,7 +113,6 @@ namespace directSp {
             this._homePageUri = Utility.checkUndefined(options.homePageUri, url ? url.origin : null);
             this._originalUri = url;
             this._ajaxProvider = options.ajaxProvider ? options.ajaxProvider : new DirectSpXmlHttpAjaxProvider();
-            this._auth = options.auth ? new DirectSpAuth(this, options.auth) : null; //must be the last one
         }
 
         public get control(): IDirectSpControl { return this._control; }
@@ -124,7 +120,6 @@ namespace directSp {
         public get storageNamePrefix(): string { return this._storageNamePrefix; }
         public get ajaxProvider(): IDirectSpAjaxProvider { return this._ajaxProvider };
         public get resourceApiUri(): string { return this._resourceApiUri; }
-        public get auth(): DirectSpAuth | null { return this._auth; }
         public get originalUri(): URL | null { return this._originalUri; }
         public get resourceAppVersion(): string | null { return this._resourceAppVersion; }
         public get dspLocalStorage(): IDirectSpStorage { return this._dspLocalStorage; }
@@ -136,7 +131,7 @@ namespace directSp {
             if (this.isLogEnabled)
                 console.log("DirectSp: initializing ...");
             await this._load();
-            return this._auth ? this._auth.init() : true;
+            return true;
         }
 
         private async _load(): Promise<void> {
@@ -318,7 +313,7 @@ namespace directSp {
                 data: invokeParams,
                 method: "POST",
                 headers: {
-                    authorization: this.auth ? this.auth.authorizationHeader : null,
+                    authorization: this.authHeader,
                     "Content-Type": "application/json;charset=utf-8"
                 },
                 cache: invokeParams.invokeOptions ? invokeParams.invokeOptions.cache : false
@@ -332,7 +327,7 @@ namespace directSp {
         //manage onError
         public async _fetch(request: IDirectSpRequest): Promise<IDirectSpResponse> {
             try {
-                return await this._fetch2(request);
+                return await this._fetchProvider(request);
             }
             catch (error) {
                 // create error controller
@@ -349,23 +344,6 @@ namespace directSp {
                 }
                 throw error;
             }
-        }
-
-        //manage auth and RefreshToken
-        private async _fetch2(request: IDirectSpRequest): Promise<IDirectSpResponse> {
-
-            //refresh token if the request is auth exists and the request is not refresh_token
-            if (this.auth && (!request.data || request.data.grant_type != 'refresh_token')) {
-                //refreshing token
-                await this.auth.refreshToken();
-
-                //update authorization header
-                if (request.headers)
-                    request.headers.authorization = this.auth.authorizationHeader; //update request token
-            }
-
-            // fetch again with valid token
-            return this._fetchProvider(request);
         }
 
         private _fetchProvider(request: IDirectSpRequest): Promise<IDirectSpResponse> {
