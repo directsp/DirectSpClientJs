@@ -2,8 +2,8 @@ namespace directSp {
 
     export class DirectSpError extends Error {
         public errorType: string | null = null;
+        public errorId: number | null = null;
         public errorName: string | null = null;
-        public errorNumber: number | null = null;
         public errorMessage: string | null = null;
         public errorDescription: string | null = null;
         public errorProcName: string | null = null;
@@ -29,7 +29,7 @@ namespace directSp {
                 error.errorName = "unknown";
             } else if (data == "number") {
                 error.errorType = "number";
-                error.errorNumber = data;
+                error.errorId = data;
             } else if (typeof data == "string") {
                 error.errorType = "string";
                 error.errorName = data;
@@ -37,13 +37,13 @@ namespace directSp {
                 error.errorName = data;
             } else if (
                 data.errorName != null ||
-                data.errorNumber != null ||
+                data.errorId != null ||
                 data.error != null ||
                 data.error_description != null
             ) {
                 //copy all data
                 error.errorName = Utility.checkUndefined(data.errorName, null);
-                error.errorNumber = Utility.checkUndefined(data.errorNumber, null);
+                error.errorId = Utility.checkUndefined(data.errorId, null);
                 error.errorMessage = Utility.checkUndefined(data.errorMessage, null);
                 error.errorType = Utility.checkUndefined(data.errorType, null);
                 error.errorDescription = Utility.checkUndefined(data.errorDescription, null);
@@ -73,7 +73,7 @@ namespace directSp {
             if (error.errorDescription) {
                 try {
                     let obj = JSON.parse(error.errorDescription);
-                    if (obj.errorName || obj.errorNumber)
+                    if (obj.errorName || obj.errorId)
                         return DirectSpError.create(obj);
                 } catch (e) { }
             }

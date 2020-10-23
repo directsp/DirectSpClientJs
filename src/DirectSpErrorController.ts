@@ -10,7 +10,7 @@ namespace directSp {
         public captchaCode: string | null = null;
         private _data: IDirectSpErrorControllerOptions;
         private _error: DirectSpError;
-        private _errorNumber: number | null;
+        private _errorId: number | null;
         private readonly _canRetry: boolean;
         private readonly _captchaImageUri: string | null = null;
         private readonly _promise: Promise<IDirectSpResponse>;
@@ -21,16 +21,16 @@ namespace directSp {
         constructor(data: IDirectSpErrorControllerOptions) {
             this._data = data;
             this._error = data.error;
-            this._errorNumber = data.error ? data.error.errorNumber : null;
+            this._errorId = data.error ? data.error.errorId : null;
 
             //55022: InvalidCaptcha, 55027: Maintenance, 55028: MaintenanceReadOnly
             this._canRetry =
-                this._errorNumber == 55022 ||
-                this._errorNumber == 55027 ||
-                this._errorNumber == 55028 ||
-                this._errorNumber == 503;
+                this._errorId == 55022 ||
+                this._errorId == 55027 ||
+                this._errorId == 55028 ||
+                this._errorId == 503;
 
-            if (this._errorNumber == 55022) {
+            if (this._errorId == 55022) {
                 this._captchaImageUri =
                     "data:image/png;base64," + data.error.errorData.captchaImage;
                 this.captchaCode = null;
@@ -61,7 +61,7 @@ namespace directSp {
 
             if (this._isReleased) return;
 
-            if (request && this._errorNumber == 55022) {
+            if (request && this._errorId == 55022) {
                 const requestData: any = request.data;
                 let invokeOptions = request.data && request.data.invokeOptions ? <IDirectSpInvokeOptions>request.data.invokeOptions : null;
 

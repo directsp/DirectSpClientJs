@@ -73,7 +73,7 @@ namespace directSp {
                 req.onerror = () => {
                     const error = new DirectSpError("Network error or server unreachable!");
                     error.errorName = "Network Error";
-                    error.errorNumber = 503;
+                    error.errorId = 503;
                     reject(error);
                 };
 
