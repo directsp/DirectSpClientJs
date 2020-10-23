@@ -80,6 +80,7 @@ namespace directSp {
         public onBeforeInvoke: ((hookParams: IDirectSpHookParams) => Promise<IDirectSpRequest | void>) | null = null;
 
         public constructor(options: IDirectSpOptions) {
+            if (!options) throw new DirectSpError("options parameter has not been set!");
 
             if (!options.dspLocalStorage) {
                 if (!Utility.isHtmlHost)
